@@ -1,29 +1,37 @@
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from langchain_openai import ChatOpenAI
+import os
 
 load_dotenv()
 
-# Define the model
-llm = HuggingFaceEndpoint(
-    repo_id="meta-llama/Llama-3.1-8B-Instruct",
-    task="text-generation"
+# NVIDIA OpenAI-compatible endpoint
+llm = ChatOpenAI(
+    model="openai/gpt-oss-120b",
+    base_url="https://integrate.api.nvidia.com/v1",
+    api_key=os.getenv("NVIDIA_API_KEY"),
+    temperature=0
 )
-
-model = ChatHuggingFace(llm=llm)
 
 parser = JsonOutputParser()
 
 template = PromptTemplate(
-    template='Give me 5 facts about {topic} \n {format_instruction}',
-    input_variables=['topic'],
-    partial_variables={'format_instruction': parser.get_format_instructions()}
+    template="""
+Give me 5 facts about {topic}.
+
+{format_instructions}
+""",
+    input_variables=["topic"],
+    partial_variables={
+        "format_instructions": parser.get_format_instructions()
+    }
 )
 
-chain = template | model | parser
+chain = template | llm | parser
 
-result = chain.invoke({'topic':'male reproductive part'})
+result = chain.invoke({
+    "topic": "male reproductive part"
+})
 
 print(result)
-

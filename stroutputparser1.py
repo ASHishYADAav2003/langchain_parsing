@@ -1,3 +1,5 @@
+import os
+
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
@@ -6,7 +8,11 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 
 
-model = ChatOpenAI()
+model = ChatOpenAI(
+    model="openai/gpt-oss-120b",
+    base_url="https://integrate.api.nvidia.com/v1",
+    api_key=os.getenv("NVIDIA_API_KEY"),
+    temperature=0)
 
 # 1st prompt -> detailed report
 template1 = PromptTemplate(
