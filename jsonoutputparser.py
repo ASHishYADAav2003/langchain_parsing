@@ -31,7 +31,7 @@ Give me 5 facts about {topic}.
 chain = template | llm | parser
 
 result = chain.invoke({
-    "topic": "male reproductive part"
+    "topic": "difference between langchain and langchain"
 })
 
 print(result)
